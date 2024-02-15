@@ -1,0 +1,53 @@
+global:
+  netbird:
+    domain: netbird.example.com
+  ingress:
+    enabled: false
+    className: ""
+    tls:
+      enabled: false
+    annotations:
+      http: {}
+        # cert-manager.io/cluster-issuer: letsencrypt
+      grpc: {}
+        # cert-manager.io/cluster-issuer: letsencrypt
+        # nginx.ingress.kubernetes.io/backend-protocol: GRPC
+        # nginx.ingress.kubernetes.io/configuration-snippet: |
+        #     grpc_ssl_verify off;
+        #     grpc_socket_keepalive on;
+        #     grpc_read_timeout 1d;
+        #     grpc_send_timeout 1d;
+
+dashboard:
+  enabled: false
+  auth:
+    audience: ""
+    clientId: ""
+    clientSecret:
+      value: ""
+      existingSecret: ""
+    authority: ""
+    supportedScopes: ""
+    redirectUri: ""
+    silentRedirectUri: ""
+  useAuth0: false
+  tokenSource: ""
+
+management:
+  enabled: false
+  configuration:
+    existingSecret: ""
+  persistence:
+    enabled: false
+
+signal:
+  enabled: false
+
+coturn:
+  enabled: false
+  password:
+    value: ""
+    existingSecret: ""
+  externalIpAddress: 203.0.113.1
+  minPort: 49152
+  maxPort: 65535

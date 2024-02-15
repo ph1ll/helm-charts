@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dashboard.fullname" . }}
+  labels:
+    {{- include "dashboard.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "dashboard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "dashboard.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "dashboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: NETBIRD_MGMT_API_ENDPOINT
+              value: "https://{{ .Values.global.netbird.domain }}"
+            - name: NETBIRD_MGMT_GRPC_API_ENDPOINT
+              value: "https://{{ .Values.global.netbird.domain }}"
+            - name: AUTH_AUDIENCE
+              value: "{{ .Values.auth.audience }}"
+            - name: AUTH_CLIENT_ID
+              value: "{{ .Values.auth.clientId }}"
+            {{- if and .Values.auth.clientSecret .Values.auth.clientSecret.value }}
+            {{- if not .Values.auth.clientSecret.existingSecret }}
+              - name: AUTH_CLIENT_SECRET
+                value: "{{ .Values.auth.clientSecret.value }}"
+            {{- end }}
+            {{- end }}
+            {{- if and .Values.auth.clientSecret .Values.auth.clientSecret.existingSecret }}
+            - name: AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef: 
+                  name: {{ .Values.auth.clientSecret.existingSecret }}
+                  value: NETBIRD_AUTH_CLIENT_SECRET
+            {{- end }}
+            - name: AUTH_AUTHORITY
+              value: "{{ .Values.auth.authority }}"
+            - name: USE_AUTH0
+              value: "{{ .Values.useAuth0 | default "false" }}"
+            - name: AUTH_SUPPORTED_SCOPES
+              value: "{{ .Values.auth.supportedScopes }}"
+            - name: AUTH_REDIRECT_URI
+              value: "{{ .Values.auth.redirectUri }}"
+            - name: AUTH_SILENT_REDIRECT_URI
+              value: "{{ .Values.auth.silentRedirectUri }}"
+            - name: NETBIRD_TOKEN_SOURCE
+              value: "{{ .Values.tokenSource }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
