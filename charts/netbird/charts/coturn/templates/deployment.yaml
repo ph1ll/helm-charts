@@ -64,7 +64,7 @@ spec:
             - --max-port={{ .Values.maxPort | default 65535 }}
             - --fingerprint
             - --lt-cred-mech
-            - --user=self:$$COTURN_PASSWORD
+            - --user=self:$COTURN_PASSWORD
             - --realm=wiretrustee.com
             - --no-software-attribute
             - --log-file=stdout
