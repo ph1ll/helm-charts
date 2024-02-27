@@ -1,0 +1,54 @@
+{{- if .Values.global.ingress.enabled -}}
+{{- $fullName := include "management.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $domainName := .Values.global.netbird.domain | required ".Values.global.netbird.domain is required." -}}
+{{- if and .Values.global.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.global.ingress.annotations.grpc "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.global.ingress.annotations.grpc "kubernetes.io/ingress.class" .Values.global.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-grpc
+  labels:
+    {{- include "management.labels" . | nindent 4 }}
+  {{- with .Values.global.ingress.annotations.grpc }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.global.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.global.ingress.className }}
+  {{- end }}
+  {{- if .Values.global.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - "{{ $domainName }}"
+      secretName: {{ $domainName }}-tls
+  {{- end }}
+  rules:
+    - host: {{ $domainName }}
+      http:
+        paths:
+          - path: /management.ManagementService/
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: Prefix
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+{{- end }}
