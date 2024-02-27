@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "coturn.fullname" . }}
+  name: {{ include "coturn.fullname" . }}-stun-turn-tcp
   labels:
     {{- include "coturn.labels" . | nindent 4 }}
 spec:
@@ -11,9 +11,5 @@ spec:
       targetPort: {{ .Values.service.port }}
       protocol: TCP
       name: stun-turn-tcp
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.port }}
-      protocol: UDP
-      name: stun-turn-udp
   selector:
     {{- include "coturn.selectorLabels" . | nindent 4 }}
