@@ -1,0 +1,32 @@
+apiVersion: v1
+entries:
+  netbird:
+  - apiVersion: v2
+    created: "2024-02-27T15:04:54.435036307Z"
+    dependencies:
+    - condition: dashboard.enabled
+      name: dashboard
+      repository: ""
+      version: 0.1.0
+    - condition: management.enabled
+      name: management
+      repository: ""
+      version: 0.1.0
+    - condition: signal.enabled
+      name: signal
+      repository: ""
+      version: 0.1.0
+    - condition: coturn.enabled
+      name: coturn
+      repository: ""
+      version: 0.1.0
+    description: A Helm chart for Kubernetes
+    digest: 53d7f27a3dc9f5ef9d24605c4068c59fea60c9f724383601d95d47eb7ed6de9e
+    maintainers:
+    - name: ph1ll
+    name: netbird
+    type: application
+    urls:
+    - https://github.com/ph1ll/helm-charts/releases/download/netbird-0.1.0/netbird-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-02-27T15:04:54.435047208Z"
