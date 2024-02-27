@@ -56,7 +56,7 @@ spec:
               valueFrom:
                 secretKeyRef: 
                   name: {{ .Values.auth.clientSecret.existingSecret }}
-                  value: NETBIRD_AUTH_CLIENT_SECRET
+                  key: NETBIRD_AUTH_CLIENT_SECRET
             {{- end }}
             - name: AUTH_AUTHORITY
               value: "{{ .Values.auth.authority }}"
