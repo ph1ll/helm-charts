@@ -48,7 +48,7 @@ spec:
             valueFrom:
               secretKeyRef: 
                 name: {{ .Values.password.existingSecret }}
-                value: COTURN_PASSWORD
+                key: COTURN_PASSWORD
           {{- end }}
           ports:
             - name: stun-turn-tcp
