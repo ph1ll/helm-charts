@@ -44,9 +44,9 @@ spec:
             - --port
             - {{ quote .Values.service.port }}
             - --disable-anonymous-metrics
-            - {{ .Values.global.netbird.disableAnonymousMetrics | default "false" }}
+            - "{{ .Values.global.netbird.disableAnonymousMetrics | default "false" }}"
             - --dns-domain
-            - "{{ .Values.global.netbird.dnsDomain | default "netbird.selfhosed" }}"
+            - {{ .Values.global.netbird.dnsDomain | default "netbird.selfhosed" }}
             {{- if .Values.global.netbird.singleAccountModeDomain }}
             - --single-account-mode-domain
             - {{ .Values.global.netbird.singleAccountModeDomain }}
