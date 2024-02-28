@@ -42,12 +42,3 @@ management:
 
 signal:
   enabled: false
-
-coturn:
-  enabled: false
-  password:
-    value: ""
-    existingSecret: ""
-  externalIpAddress: 203.0.113.1
-  minPort: 49152
-  maxPort: 65535
