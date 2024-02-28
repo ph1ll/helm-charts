@@ -1,6 +1,9 @@
 global:
   netbird:
     domain: netbird.example.com
+    dnsDomain: netbird.selfhosted
+    singleAccountModeDomain: example.com
+    disableAnonymousMetrics: false
   ingress:
     enabled: false
     className: ""
