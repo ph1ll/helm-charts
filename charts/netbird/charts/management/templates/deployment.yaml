@@ -71,6 +71,8 @@ spec:
             {{- end }}
             - mountPath: /var/lib/netbird
               name: data
+            - mountPath: /tmp
+              name: tmp
       volumes:
         {{- if and .Values.configuration .Values.configuration.existingSecret }}
         - name: config
@@ -85,6 +87,9 @@ spec:
           emptyDir:
             medium: Memory
           {{- end }}
+        - name: tmp
+          emptyDir:
+            medium: Memory
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
