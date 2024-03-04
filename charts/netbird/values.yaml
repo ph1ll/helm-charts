@@ -14,6 +14,9 @@ global:
         # cert-manager.io/cluster-issuer: letsencrypt
       grpc: {}
         # cert-manager.io/cluster-issuer: letsencrypt
+        ##
+        ## The following annotations are required for use with ingress-nginx
+        ##
         # nginx.ingress.kubernetes.io/backend-protocol: GRPC
         # nginx.ingress.kubernetes.io/configuration-snippet: |
         #     grpc_ssl_verify off;
@@ -22,26 +25,81 @@ global:
         #     grpc_send_timeout 1d;
 
 dashboard:
+  ##
+  ## Set to true to enable the dashboard
+  ##
   enabled: false
   auth:
+    ##
+    ## The value for 'AUTH_AUDIENCE'
+    ##
     audience: ""
+    ##
+    ## The value for 'AUTH_CLIENT_ID'
+    ##
     clientId: ""
+    ##
+    ## The value for 'AUTH_CLIENT_SECRET'
+    ##
+    ## Use 'value' to insecurely set or use 'existingSecret' to use an existing secret. 'existingSecret'
+    ## will override any 'value'.
+    ##
     clientSecret:
       value: ""
+      ##
+      ## This secret can be created as follows:
+      ##
+      ##   kubectl -n netbird create secret generic netbird-dashboard --from-literal=NETBIRD_AUTH_CLIENT_SECRET=<secret>
+      ##
       existingSecret: ""
+    ##
+    ## The value for 'AUTH_AUTHORITY'
+    ##
     authority: ""
+    ##
+    ## The value for 'AUTH_SUPPORTED_SCOPES'
+    ##
     supportedScopes: ""
+    ##
+    ## The value for 'AUTH_REDIRECT_URI'
+    ##
     redirectUri: ""
+    ##
+    ## The value for 'AUTH_SILENT_REDIRECT_URI'
+    ##
     silentRedirectUri: ""
+  ##
+  ## The value for 'USE_AUTH0'
+  ##
   useAuth0: false
+  ##
+  ## The value for 'NETBIRD_TOKEN_SOURCE'
+  ##
   tokenSource: ""
 
 management:
+  ##
+  ## Set to true to enable the management service
+  ##
   enabled: false
   configuration:
+    ##
+    ## This secret can be created from an existing management.json file as follows:
+    ##
+    ##   kubectl -n netbird create secret generic netbird-management-configuration --from-file=./management.json
+    ##
+    ## See https://docs.netbird.io/selfhosted/selfhosted-guide for a guide to creating the management.json.
+    ##
+    ## Ensure the management.json has been populated with a value for 'DataStoreEncryptionKey', which
+    ## can be generated using 'openssl rand -base64 32'.
+    ##
     existingSecret: ""
   persistence:
     enabled: false
+    size: 1Gi
 
 signal:
+  ##
+  ## Set to true to enable the signal service
+  ##
   enabled: false
