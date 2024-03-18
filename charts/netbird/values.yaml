@@ -96,6 +96,7 @@ management:
     existingSecret: ""
   persistence:
     enabled: false
+    storageClassName: ""
     size: 1Gi
 
 signal:
