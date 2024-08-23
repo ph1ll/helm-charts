@@ -18,11 +18,11 @@ global:
         ## The following annotations are required for use with ingress-nginx
         ##
         # nginx.ingress.kubernetes.io/backend-protocol: GRPC
+        # nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"
+        # nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
         # nginx.ingress.kubernetes.io/configuration-snippet: |
         #     grpc_ssl_verify off;
         #     grpc_socket_keepalive on;
-        #     grpc_read_timeout 1d;
-        #     grpc_send_timeout 1d;
 
 dashboard:
   ##
