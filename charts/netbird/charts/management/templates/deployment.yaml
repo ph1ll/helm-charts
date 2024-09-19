@@ -61,7 +61,6 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
             - mountPath: /etc/netbird
               name: config
@@ -70,9 +69,6 @@ spec:
               name: data
             - mountPath: /tmp
               name: tmp
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
       volumes:
         - name: config
           secret:
@@ -88,8 +84,6 @@ spec:
         - name: tmp
           emptyDir:
             medium: Memory
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
