@@ -65,8 +65,6 @@ spec:
           volumeMounts:
             - mountPath: /etc/netbird
               name: config
-            - mountPath: /tmp/netbird
-              name: configTmpl
               readOnly: true
             - mountPath: /var/lib/netbird
               name: data
@@ -77,11 +75,8 @@ spec:
       {{- with .Values.volumes }}
       volumes:
         - name: config
-          emptyDir:
-            medium: Memory
-        - name: configTmpl
-          configMap:
-            name: {{ include "management.fullname" . }}
+          secret:
+            secretName: {{ .Values.config.existingSecret }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

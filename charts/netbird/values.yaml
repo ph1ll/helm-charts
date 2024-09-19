@@ -1,16 +1,14 @@
 global:
   netbird:
     domain: netbird.example.com
-    relayAuthSecret:
-      existingSecret:
-        name: netbird-secrets
 
 dashboard:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
     className: ""
-    annotations: {}
+    annotations:
+      {}
       # cert-manager.io/cluster-issuer: letsencrypt
   config:
     auth:
@@ -62,14 +60,15 @@ dashboard:
     tokenSource: ""
 
 management:
-  enabled: true
+  enabled: false
   persistence:
     enabled: true
   ingress:
     grpc:
       enabled: true
       className: ""
-      annotations: {}
+      annotations:
+        {}
         # cert-manager.io/cluster-issuer: letsencrypt
         # nginx.ingress.kubernetes.io/backend-protocol: GRPC
         # nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"
@@ -79,50 +78,50 @@ management:
     http:
       enabled: true
       className: ""
-      annotations: {}
+      annotations:
+        {}
         # cert-manager.io/cluster-issuer: letsencrypt
-  # dnsDomain: netbird.selfhosted
-  # singleAccountModeDomain: example.com
-  # disableAnonymousMetrics: false
-  # config:
-  #   Stuns:
-  #     - URI: stun:turn.example.com:3478
-  #     - URI: stun:stun1.l.google.com:3478
-  #     - URI: stun:stun2.l.google.com:3478
-  #     - URI: stun:stun3.l.google.com:3478
-  #     - URI: stun:stun4.l.google.com:3478
-  #   TURNConfig:
-  #     Turns:
-  #       - URI: turn:turn.example.com:3478
-  #         Username: "$NETBIRD_TURN_USER"
-  #         Password: "$NETBIRD_TURN_PASSWORD"
-  #   Relay:
-  #     Addresses:
-  #       - "rels://netbird.example.com/relay"
-  #     Secret: "$NETBIRD_RELAY_AUTH_SECRET"
-  #   Signal:
-  #     URI: netbird.example.com:443
-  #   ReverseProxy:
-  #     TrustedPeers:
-  #       - 0.0.0.0/0
-  #   DataStoreEncryptionKey: "$NETBIRD_DATASTORE_ENC_KEY"
+  dnsDomain: netbird.selfhosted
+  singleAccountModeDomain: example.com
+  disableAnonymousMetrics: false
+  config:
+    ##
+    ## This secret can be created from an existing management.json file as follows:
+    ##
+    ##   kubectl -n netbird create secret generic netbird-management-configuration --from-file=./management.json
+    ##
+    ## See https://docs.netbird.io/selfhosted/selfhosted-guide for a guide to creating the management.json.
+    ##
+    ## Ensure the management.json has been populated with a value for 'DataStoreEncryptionKey', which
+    ## can be generated using 'openssl rand -base64 32'.
+    ##
+    existingSecret: ""
 
 relay:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
     className: ""
-    annotations: {}
+    annotations:
+      {}
       # cert-manager.io/cluster-issuer: letsencrypt
       # nginx.org/websocket-services: http
-    
+  relayAuthSecret:
+    ##
+    ## This secret can be created as follows:
+    ##
+    ##   kubectl -n netbird create secret generic netbird-relay-secret --from-literal=NETBIRD_RELAY_AUTH_SECRET=<secret>
+    ##
+    existingSecret:
+      name: netbird-relay-secret
 
 signal:
-  enabled: true
+  enabled: false
   ingress:
     enabled: true
     className: ""
-    annotations: {}
+    annotations:
+      {}
       # cert-manager.io/cluster-issuer: letsencrypt
       # nginx.ingress.kubernetes.io/backend-protocol: GRPC
       # nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"

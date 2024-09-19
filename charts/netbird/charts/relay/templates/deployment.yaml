@@ -46,7 +46,7 @@ spec:
             - name: NB_EXPOSED_ADDRESS
               value: "rels://{{ .Values.global.netbird.domain }}:443/relay"
             - name: NB_AUTH_SECRET
-              {{- $relayAuthSecret := .Values.global.netbird.relayAuthSecret | default dict }}
+              {{- $relayAuthSecret := .Values.relayAuthSecret | default dict }}
               {{- if $relayAuthSecret.existingSecret }}
               valueFrom:
                 secrefKeyRef:
