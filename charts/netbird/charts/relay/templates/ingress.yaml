@@ -34,7 +34,7 @@ spec:
     - host: {{ .Values.global.netbird.domain | quote }}
       http:
         paths:
-          - path: /signalexchange.SignalExchange/
+          - path: /relay/
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: Prefix
             {{- end }}
