@@ -1,10 +1,9 @@
-{{- if .Values.global.ingress.enabled -}}
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "signal.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- $domainName := .Values.global.netbird.domain | required ".Values.global.netbird.domain is required." -}}
-{{- if and .Values.global.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.global.ingress.annotations.grpc "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.global.ingress.annotations.grpc "kubernetes.io/ingress.class" .Values.global.ingress.className}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -19,22 +18,20 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "signal.labels" . | nindent 4 }}
-  {{- with .Values.global.ingress.annotations.grpc }}
+  {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.global.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.global.ingress.className }}
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
-  {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:
-        - "{{ $domainName }}"
-      secretName: {{ $domainName }}-tls
-  {{- end }}
+        - {{ .Values.global.netbird.domain | quote }}
+      secretName: "{{ .Values.global.netbird.domain }}-tls"
   rules:
-    - host: {{ $domainName }}
+    - host: {{ .Values.global.netbird.domain | quote }}
       http:
         paths:
           - path: /signalexchange.SignalExchange/

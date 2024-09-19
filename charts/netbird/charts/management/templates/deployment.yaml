@@ -42,43 +42,46 @@ spec:
             - --log-level
             - {{ .Values.logLevel | default "info" }}
             - --port
-            - {{ quote .Values.service.port }}
+            - "8080"
             - --disable-anonymous-metrics
-            - "{{ .Values.global.netbird.disableAnonymousMetrics | default "false" }}"
+            - "{{ .Values.disableAnonymousMetrics | default "false" }}"
             - --dns-domain
-            - {{ .Values.global.netbird.dnsDomain | default "netbird.selfhosed" }}
+            - {{ .Values.dnsDomain | default "netbird.selfhosed" }}
             {{- if .Values.global.netbird.singleAccountModeDomain }}
             - --single-account-mode-domain
-            - {{ .Values.global.netbird.singleAccountModeDomain }}
+            - {{ .Values.singleAccountModeDomain }}
             {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
-            tcpSocket:
-              port: {{ .Values.service.port }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            tcpSocket:
-              port: {{ .Values.service.port }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- if and .Values.configuration .Values.configuration.existingSecret }}
             - mountPath: /etc/netbird
               name: config
+            - mountPath: /tmp/netbird
+              name: configTmpl
               readOnly: true
-            {{- end }}
             - mountPath: /var/lib/netbird
               name: data
             - mountPath: /tmp
               name: tmp
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
       volumes:
-        {{- if and .Values.configuration .Values.configuration.existingSecret }}
         - name: config
-          secret:
-            secretName: {{ .Values.configuration.existingSecret }}
-        {{- end }}
+          emptyDir:
+            medium: Memory
+        - name: configTmpl
+          configMap:
+            name: {{ include "management.fullname" . }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
@@ -90,6 +93,8 @@ spec:
         - name: tmp
           emptyDir:
             medium: Memory
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

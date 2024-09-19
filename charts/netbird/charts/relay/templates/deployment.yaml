@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "signal.fullname" . }}
+  name: {{ include "relay.fullname" . }}
   labels:
-    {{- include "signal.labels" . | nindent 4 }}
+    {{- include "relay.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "signal.selectorLabels" . | nindent 6 }}
+      {{- include "relay.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "signal.labels" . | nindent 8 }}
+        {{- include "relay.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "signal.serviceAccountName" . }}
+      serviceAccountName: {{ include "relay.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -36,13 +36,25 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - --log-file
-            - console
-            - --log-level
-            - {{ .Values.logLevel | default "info" }}
-            - --port
-            - "8080"
+          env:
+            - name: NB_LOG_FILE
+              value: "console"
+            - name: NB_LOG_LEVEL
+              value: {{ .Values.logLevel | default "info" }}
+            - name: NB_LISTEN_ADDRESS
+              value: ":8080"
+            - name: NB_EXPOSED_ADDRESS
+              value: "rels://{{ .Values.global.netbird.domain }}:443/relay"
+            - name: NB_AUTH_SECRET
+              {{- $relayAuthSecret := .Values.global.netbird.relayAuthSecret | default dict }}
+              {{- if $relayAuthSecret.existingSecret }}
+              valueFrom:
+                secrefKeyRef:
+                  name: {{ $relayAuthSecret.existingSecret.name | quote }}
+                  key: {{ $relayAuthSecret.existingSecret.key | default "NETBIRD_RELAY_AUTH_SECRET" | quote }}
+              {{- else }}
+              value: {{ $relayAuthSecret.value | default (randAlphaNum 32) }}
+              {{- end }}
           ports:
             - name: http
               containerPort: 8080
