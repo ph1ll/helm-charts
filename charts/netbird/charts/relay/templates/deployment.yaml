@@ -49,7 +49,7 @@ spec:
               {{- $relayAuthSecret := .Values.relayAuthSecret | default dict }}
               {{- if $relayAuthSecret.existingSecret }}
               valueFrom:
-                secrefKeyRef:
+                secretKeyRef:
                   name: {{ $relayAuthSecret.existingSecret.name | quote }}
                   key: {{ $relayAuthSecret.existingSecret.key | default "NETBIRD_RELAY_AUTH_SECRET" | quote }}
               {{- else }}
