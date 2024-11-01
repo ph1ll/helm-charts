@@ -15,21 +15,21 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.8
+version: 0.2.9
 
 dependencies:
   - name: dashboard
     condition: dashboard.enabled
-    version: 0.2.8
+    version: 0.2.9
   - name: management
     condition: management.enabled
-    version: 0.2.8
+    version: 0.2.9
   - name: relay
     condition: relay.enabled
-    version: 0.2.8
+    version: 0.2.9
   - name: signal
     condition: signal.enabled
-    version: 0.2.8
+    version: 0.2.9
 
 maintainers:
   - name: ph1ll
