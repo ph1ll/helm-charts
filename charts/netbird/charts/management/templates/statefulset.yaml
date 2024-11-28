@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "management.fullname" . }}
   labels:
@@ -66,21 +66,18 @@ spec:
               name: config
               readOnly: true
             - mountPath: /var/lib/netbird
-              name: data
+              name: {{ include "management.fullname" . }}-data
             - mountPath: /tmp
               name: tmp
       volumes:
         - name: config
           secret:
             secretName: {{ .Values.config.existingSecret }}
+        {{- if not .Values.persistence.enabled }}
         - name: data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "management.fullname" . }}-data
-          {{- else }}
           emptyDir:
             medium: Memory
-          {{- end }}
+        {{- end }}
         - name: tmp
           emptyDir:
             medium: Memory
@@ -96,3 +93,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ include "management.fullname" . }}-data
+      spec:
+        {{- if .Values.persistence.storageClassName }}
+        storageClassName: "{{- .Values.persistence.storageClassName }}"
+        {{- end }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ .Values.persistence.size | default "1Gi" }}"
+  {{- end }}
