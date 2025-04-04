@@ -128,6 +128,3 @@ signal:
       # nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
       # nginx.ingress.kubernetes.io/configuration-snippet: |
       #   grpc_socket_keepalive on;
-
-kubernetes-operator:
-  enabled: false

@@ -30,10 +30,6 @@ dependencies:
   - name: signal
     condition: signal.enabled
     version: 0.2.17
-  - name: kubernetes-operator
-    condition: kubernetes-operator.enabled
-    version: 0.1.6
-    repository: "https://netbirdio.github.io/kubernetes-operator"
 
 maintainers:
   - name: ph1ll
